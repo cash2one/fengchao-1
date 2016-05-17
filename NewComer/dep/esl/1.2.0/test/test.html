@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>loader test</title>
+
+<script src="../src/esl.js"></script>
+<!--script src="impl/requirejs/require.js"></script-->
+<!--script src="impl/needs/needs.js"></script-->
+<!--script src="impl/lsjs/lsjs.js"></script-->
+<script>
+require.config( {
+    baseUrl: '.',
+    paths: {
+        'css': '../src/css',
+        'js': '../src/js',
+        'abspath': '/test/pathstest',
+        'relapath': 'pathstest/rela'
+    },
+    map: {
+        'usecjs': {
+            simple: 'cjs/simple'
+        },
+        'usecjs/change2amd': {
+            simple: 'amd/simple'
+        }
+    },
+    packages: [
+        'pkgclassic/1.0',
+        {
+            name: 'pkgsetmain',
+            location: 'pkgsetmain/2.0',
+            main: 'index'
+        }
+    ]
+} );
+</script>
+
+<style>
+.uncheck,
+.checking,
+.pass,
+.fail {
+    width: 60px;
+}
+
+.uncheck { background: #eee; }
+.checking { background: yellow; }
+.pass { background: green; }
+.fail { background: red; }
+
+.cssplugin,
+.cssplugin-local{ visibility: hidden; }
+</style>
+</head>
+
+<body>
+<table>
+    <tr>
+        <th colspan="2" align="left">AMD:</th>
+    </tr>
+    <tr>
+        <td><input value="amd/simple" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/noDefineId" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/objectFactory" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/simpleDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/relativeDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/manyDependencies" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/innerDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/innerRelativeDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/deepDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/circleDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="amd/combine" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <th colspan="2" align="left">CJS:</th>
+    </tr>
+    <tr>
+        <td><input value="cjs/simple" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/noDefineId" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/simpleDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/relativeDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/manyDependencies" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/deepDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/circleDependency" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="cjs/combine" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <th colspan="2" align="left">CSS Plugin:</th>
+    </tr>
+    <tr>
+        <td><input value="globalLoadCss" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="localLoadCss" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <th colspan="2" align="left">Conf paths:</th>
+    </tr>
+    <tr>
+        <td><input value="relapath" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="abspath" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <th colspan="2" align="left">Conf map:</th>
+    </tr>
+    <tr>
+        <td><input value="mapVersion" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="longMapFirst" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="nomapGlobal" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <th colspan="2" align="left">Conf packages:</th>
+    </tr>
+    <tr>
+        <td><input value="stringPackage" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+    <tr>
+        <td><input value="objectPackage" type="button"></td>
+        <td class="uncheck"></td>
+    </tr>
+</table>
+
+<script>
+function checkNormalModule( name, stateTd, module, callback ) {
+    if ( 
+        module 
+        && module.name == name
+        && ( typeof module.check != 'function' 
+             || module.check() )
+    ) {
+        stateTd.className = 'pass';
+    }
+    else {
+        stateTd.className = 'fail';
+    }
+
+    if ( typeof callback == 'function' ) {
+        setTimeout( callback, 1 );
+    }
+}
+
+function nomapGlobal( stateTd, callback ) {
+    require( [ 'simple/index' ], function ( module ) {
+        checkNormalModule( 'simple/index', stateTd, module, callback );
+    } );
+}
+
+function longMapFirst( stateTd, callback ) {
+    require( [ 'usecjs/change2amd' ], function ( module ) {
+        checkNormalModule( 'usecjs/change2amd', stateTd, module, callback );
+    } );
+}
+
+function mapVersion( stateTd, callback ) {
+    require( [ 'usecjs/index' ], function ( module ) {
+        checkNormalModule( 'usecjs/index', stateTd, module, callback );
+    } );
+}
+
+function objectPackage( stateTd, callback ) {
+    require( [ 'pkgsetmain' ], function ( module ) {
+        checkNormalModule( 'pkgsetmain', stateTd, module, callback );
+    } );
+}
+
+function stringPackage( stateTd, callback ) {
+    require( [ 'pkgclassic' ], function ( module ) {
+        checkNormalModule( 'pkgclassic', stateTd, module, callback );
+    } );
+}
+
+function globalLoadCss( stateTd, callback ) {
+    stateTd.className = 'pass cssplugin';
+
+    require( [ 'css!cssplugin/style.css' ], function () {
+        callback();
+    } );
+}
+
+function localLoadCss( stateTd, callback ) {
+    stateTd.className = 'pass cssplugin-local';
+
+    require( [ 'cssplugin/index' ], function ( mod ) {
+        if ( mod.name != 'cssplugin/index' ) {
+            stateTd.className = 'fail';
+        }
+
+        callback();
+    } );
+}
+
+(function () {
+
+    if ( !window.console ) {
+        var text = document.createElement( 'textarea' );
+        text.style.width = "800px";
+        text.style.height = "400px";
+        if ( !/[\?|]console/.test( location.search ) ) {
+            text.style.display = 'none';
+        }
+        document.body.appendChild( text );
+        window.console = { log: function ( str ) {
+            text.value += '\n' + str;
+        } };
+    }
+
+
+    document.body.onclick = function ( e ) {
+        e = e || window.event;
+        var target = e.srcElement || e.target;
+
+        if ( target.tagName == 'INPUT' && target.getAttribute( 'type' ) == 'button' ) {
+            checking( target );
+        }
+    };
+
+    function getStateTd( td ) {
+        td = td.parentNode.nextSibling;
+        while ( td ) {
+            if ( td.nodeType == 1 && td.tagName == 'TD' ) {
+                break;
+            }
+
+            td = td.nextSibling;
+        }
+
+        return td;
+    }
+
+    function checking( target, callback ) {
+        var stateTd = getStateTd( target );
+        stateTd.className = 'checking';
+        var value = target.value;
+
+        if ( window[ value ] ) {
+            window[ value ]( stateTd, callback );
+        }
+        else {
+            var moduleId = target.value + '/index';
+
+            require( [ moduleId ], function ( module ) {
+                checkNormalModule( moduleId, stateTd, module, callback );
+            } );
+        }
+    }
+
+
+    var buttons = document.getElementsByTagName( 'input' )
+    var index = 0;
+    var len = buttons.length;
+    function checkNext() {
+        if ( index < len ) {
+            checking( buttons[ index++ ], checkNext );
+        }
+        else {
+            alert( (new Date) - now)
+        }
+    }
+    
+    if ( /[\?|]autostart/.test( location.search ) ) {
+        var now = new Date;
+        checkNext();
+    }
+    
+})();
+
+
+</script>
+</body>
+</html>
