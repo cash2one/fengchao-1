@@ -188,6 +188,7 @@ define(
          * @param {object} table 表格控件本身
          * @param {number} index 行号
          */
+        // MARK selectedIndex: [行号的一个数组]
         function setSelectedIndex(table, selectedIndex) {
             table.selectedIndex = selectedIndex;
             var selectedIndexMap = {};
@@ -257,9 +258,10 @@ define(
 
             // 避免刷新时重新注入
             var fields = table.fields;
-            var realFields = fields.slice(0);
+            var realFields = fields.slice(0); // MARK 复制 fields 数组
             var len = realFields.length;
 
+            // MARK 这个循环好像有问题(没问题，因为这里是 倒序 的方式来循环的)
             while (len--) {
                 if (!realFields[len]) {
                     realFields.splice(len, 1);

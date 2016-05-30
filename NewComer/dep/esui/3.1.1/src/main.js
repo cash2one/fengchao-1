@@ -393,6 +393,7 @@ define(
 
                 // 有时候，一个控件会自己把`main.innerHTML`生成子控件，比如`Panel`，
                 // 但这边有缓存这些子元素，可能又会再生成一次，所以要去掉
+                // MARK: config.instanceAttr: 'data-ctrl-id'
                 if (element.getAttribute(config.instanceAttr)) {
                     continue;
                 }
@@ -407,6 +408,9 @@ define(
                     var name = attribute.name;
                     var value = attribute.value;
 
+
+                    // MARK 先分析是否是 extention control
+                    // data-ui-extention 比 data-ui 优先级高
                     if (name.indexOf(extPrefix) === 0) {
                         // 解析extension的key
                         var terms = name.slice(extPrefixLen + 1).split('-');
@@ -430,6 +434,7 @@ define(
                 }
 
                 // 根据选项创建控件
+                // MARK data-ui 属性方式 比 标签名 方式 优先级高。
                 var type = controlOptions.type;
                 if (!type) {
                     var nodeName = element.nodeName.toLowerCase();
@@ -449,6 +454,7 @@ define(
                 }
                 if (type) {
                     // 从用户传入的properties中merge控件初始化属性选项
+                    // 初始化的时候，从用户传入的 配置里边properties 来读取每个控件的属性
                     var controlId = controlOptions.id;
                     var customOptions = controlId
                         ? properties[controlId]
@@ -460,6 +466,7 @@ define(
                     // 创建控件的插件
                     var extensions = controlOptions.extensions || [];
                     controlOptions.extensions = extensions;
+                    // MARK 先创建控件的所有插件，并保存到控件的配置选项里controlOptions.extensions
                     for (var key in extensionOptions) {
                         var extOption = extensionOptions[key];
                         var extension = main.createExtension(
@@ -470,6 +477,7 @@ define(
                     }
 
                     // 绑定视图环境和控件主元素
+                    // MARK options 是 init 时传递的配置对象
                     controlOptions.viewContext = options.viewContext;
                     // 容器类控件会需要渲染自己的`innerHTML`，
                     // 这种渲染使用`initChildren`，再调用`main.init`，
@@ -483,9 +491,11 @@ define(
                     if (control) {
                         controls.push(control);
                         if (options.parent) {
+                            // MARK 生成一个控件树形结构
                             options.parent.addChild(control);
                         }
                         try {
+                            // MARK 这个函数需要控件重载
                             control.render();
                         }
                         catch (ex) {
@@ -534,6 +544,7 @@ define(
          * @param {Object} options 初始化参数
          * @return {Extension}
          */
+        // MARK 创建 控件插件 实例
         main.createExtension = function (type, options) {
             return createInstance(type, options, extensionClasses);
         };
@@ -544,6 +555,7 @@ define(
          * @type {Object}
          * @ignore
          */
+        // MARK globalExtension 是所有控件会创建的插件
         var globalExtensionOptions = {};
 
         /**
@@ -556,6 +568,7 @@ define(
          * @param {string} type 扩展类型
          * @param {Object} options 扩展初始化参数
          */
+        // MARK 声明 控件插件 的配置选项
         main.attachExtension = function (type, options) {
             globalExtensionOptions[type] = options;
         };
@@ -596,6 +609,7 @@ define(
          * @throws
          * 已经有相同`prototype.type`的验证规则类存在，不能重复注册同类型验证规则
          */
+        // MARK 注册所有控件的验证规则
         main.registerRule = function (ruleClass, priority) {
             // 多个Rule共享一个属性似乎也没问题
             ruleClasses.push({ type: ruleClass, priority: priority });

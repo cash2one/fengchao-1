@@ -60,6 +60,7 @@ define(
             for (var i = 0; i < extensions.length; i++) {
                 var extension = extensions[i];
                 if (!registeredExtensions[extension.type]) {
+                    // MARK 把插件 挂载 到控件上
                     extension.attachTo(this.control);
                     registeredExtensions[extension.type] = true;
                 }

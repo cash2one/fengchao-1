@@ -15,7 +15,7 @@ define(
         // MARK 这里存储的应该是下面这样子的
         // globalEvents = {
         //     window: {
-        //         click: [control1, control2 ..]
+        //         click: [control1, control2 ..] 这个数组上还有个 hander 属性挂载着处理函数
         //     }
         // }
         var globalEvents = {

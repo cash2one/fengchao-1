@@ -44,8 +44,11 @@ define(
             // MARK 大致的数据结构存储如下：
             // this.main._esuiDOMEvent ---> guid
             // this.domEvents[guid] ----> {element -> mainElement, type(类似'click') -> eventQueue}
+            // this.childrenIndex -----> {childname: childControl}
             this.children = [];
             this.childrenIndex = {};
+            // MARK 注意 stage 和 states不一样。一个指控件处于何种阶段(比如初始化、渲染、销毁)
+            // ，另一个指控件的状态(比如 disabled / enabled等)
             this.currentStates = {};
             this.domEvents = {};
 
@@ -151,6 +154,7 @@ define(
              * @param {Object} [options] 构造函数传入的选项
              * @protected
              */
+            // MARK 把options里的参数都 拷贝到 control里
             initOptions: function (options) {
                 options = options || {};
                 this.setProperties(options);
@@ -162,6 +166,7 @@ define(
              * @return {HTMLElement}
              * @protected
              */
+            // MARK 当没有 main元素的时候，会创建一个自定义元素
             createMain: function () {
                 if (!this.type) {
                     return document.createElement('div');
@@ -210,6 +215,7 @@ define(
                      */
                     this.fire('beforerender');
 
+                    // MARK domIDPrefix 这个属性是干嘛的?
                     this.domIDPrefix = this.viewContext.id;
 
                     this.initStructure();
@@ -221,6 +227,7 @@ define(
                     }
 
                     // 为控件主元素添加控件实例标识属性
+                    // MARK
                     this.main.setAttribute(
                         ui.getConfig('instanceAttr'),
                         this.id
@@ -242,7 +249,7 @@ define(
                     }
                 }
 
-                // 由子控件实现
+                // 由子类实现
                 this.repaint();
 
                 if (this.helper.isInStage('INITED')) {
@@ -464,6 +471,7 @@ define(
                     }
                 }
 
+                // MARK 只有在 rendered 之后，设置属性才会导致 controll 的重新渲染
                 if (changes.length && this.helper.isInStage('RENDERED')) {
                     this.repaint(changes, changesIndex); // MARK 在setProperties的时候，会触发repaint方法
                 }
@@ -495,6 +503,7 @@ define(
                 viewContext && viewContext.add(this);
 
                 // 切换子控件的视图环境
+                // MARK 这是一个递归
                 var children = this.children;
                 if (children) {
                     for (var i = 0, len = children.length; i < len; i++) {
