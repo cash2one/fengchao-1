@@ -113,6 +113,7 @@ define(
          * @param {Object} element dom元素
          * @param {Object} e 事件对象
          */
+        // MARK 鼠标移动到入口元素上时，为入口元素添加样式
         function entryOverHandler(element, e) {
             entryOver(this, element);
         }
@@ -164,6 +165,7 @@ define(
                     index:index, 
                     item: dataItem
                 };
+                // MARK 让表格出发 subrowopen 事件，从而来设置 subrow 中的内容
                 eventArgs = table.fire('subrowopen', eventArgs);
                 if (!eventArgs.isDefaultPrevented()) {
                     openSubrow(table, index, el);
@@ -183,6 +185,7 @@ define(
          * @param {Object} entry dom元素
          * @return {bool}
          */
+        // MARK 移除那一行的样式 、 入口样式 、 设置入口title 、 隐藏子行
         function closeSubrow(table, index, entry) {
             var eventArgs = { 
                 index: index, 
@@ -224,6 +227,7 @@ define(
          * @param {number} index 子行的序号
          * @param {Object} entry dom元素
          */
+        // MARK 打开子行
         function openSubrow(table, index, entry) {
             var currentIndex = table.subrowIndex;
             var closeSuccess = 1;
@@ -248,6 +252,7 @@ define(
             
             lib.g(getSubrowId(table, index)).style.display = '';
             
+            // MARK 如果是互斥的，需要用subrowIndex来实现
             (table.subrowMutex) && (table.subrowIndex = index);
         }
 
@@ -286,13 +291,14 @@ define(
          *
          * @return {Object}
          */
+        // MARK 生成入口处的html
         function getSubEntryHtml(
             table, data, field, rowIndex, fieldIndex, extraArgs
         ) {
             var subrow = extraArgs.subrow;
             var subentry = subrow && field.subEntry;
             var result = {
-                notInText: true,
+                notInText: true,    // MARK  和表格的基础文本信息是分开的
                 width: table.subEntryWidth,
                 align: 'right'
             };
@@ -413,7 +419,7 @@ define(
             target.addRowBuilders([
                 {
                     index: 0,
-                    getRowArgs: getSubrowArgs,
+                    getRowArgs: getSubrowArgs,  // MARK return {subrow: true}
                     getColHtml: getSubEntryHtml,
                     getSubrowHtml : getSubrowHtml
                 }

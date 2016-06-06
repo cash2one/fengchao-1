@@ -94,6 +94,8 @@ define(function (require) {
      */
     /* eslint-disable fecs-max-statements */
     /* 从ESUI拿的旧的main，暂时去掉50行的限制 */
+
+    // MARK 这个  和  esui.init 没有区别
     main.init = function (wrap, options) {
         wrap = wrap || document.body;
         options = options || {};
@@ -492,6 +494,7 @@ define(function (require) {
      * @param {Object} options 初始化参数
      * @return {Control}
      */
+    // fcui 中的控件创建 优先于 esui中的控件 创建
     main.create = function (type, options) {
         // 若有控件先于FCUI main初始化时register，则这些控件会放在ESUI的闭包classes中，
         // 这里若本地FCUI找不到想要的控件，则回退到ESUI中。

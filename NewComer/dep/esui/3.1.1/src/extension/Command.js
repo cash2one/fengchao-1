@@ -43,6 +43,8 @@ define(
          * @param {Object} [options] 初始化配置
          * @constructor
          */
+        // MARK 可以在html设置控件和控件扩展的时候，
+        // 设置data-ui-extension-command-events设置出发这个command的事件类型
         function Command(options) {
             options = options || {};
             if (!options.events) {
@@ -79,6 +81,9 @@ define(
          * @param {Event} e 事件对象
          * @protected
          */
+        // MARK 当这个control中有元素设置了 data-command: commandType 属性的时候，
+        // 如果这个元素上的事件(比如click/hover等)触发的时候，会触发这个控件对应的 command事件
+        // 并把 commandType 和 data-command-args 中的数据传递进去
         Command.prototype.handleCommand = function (e) {
             var target = e.target;
             // 为了让`main`上的点击也能触发，要一直追溯到`main`的父节点

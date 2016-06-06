@@ -625,6 +625,8 @@ define(
                     {id: headPanelId}
                 );
 
+
+                // MARK 初始化 head panel
                 table.initChildren(head);
                 table.headPanel = table.viewContext.get(headPanelId);
 
@@ -652,9 +654,11 @@ define(
                 head.style.width = table.bodyWidth + 'px';
             }
 
+            // MARK 初始化headPanel中的html
             lib.g(headPanelId).innerHTML = getHeadHtml(table);
 
             //初始化表头子控件
+            // 初始化 head-panel 中的 子控件
             initHeadChildren(table, table.viewContext.get(headPanelId));
         }
 
@@ -1258,6 +1262,7 @@ define(
          *
          * @private
          */
+        // MARK 表格单元中的 控件 是在哪里初始化的?
         function renderBody(table) {
             var tBody = getBody(table);
             var tBodyPanelId = getId(table, 'body-panel');
@@ -1273,6 +1278,7 @@ define(
                     '<div id="${id}" data-ui="type:Panel;id:${id}"></div>',
                     {id: tBodyPanelId}
                 );
+                // MARK 初始化 body-panel
                 table.initChildren(tBody);
                 table.bodyPanel = table.viewContext.get(tBodyPanelId);
             }
@@ -1374,6 +1380,7 @@ define(
          * @param {Object} table
          * @param {Array} builderList rowBuilder数组
          */
+        // MARK builder.index 是 优先级？
         function addRowBuilderList(table, builderList) {
             var rowBuilderList = table.rowBuilderList || [];
             for (var i = 0, l = builderList.length; i <l; i++) {
@@ -1407,6 +1414,7 @@ define(
          * @param {Object} table
          *
          */
+        // MARK 生成表格元素的基本内容(即 没有 extension 的内容)
         function initBaseBuilderList(table) {
             addRowBuilderList(
                 table,
@@ -1428,6 +1436,8 @@ define(
          * @param {number} index 当前行的序号
          * @return {string}
          */
+        // MARK builderList 中的第一个是用来生成表格最初html的，其他的都是用来生成
+        // 表格的extensions的html
         function getRowHtml(table, data, index, builderList) {
             var html = [];
             var fields = table.realFields;
@@ -1456,10 +1466,10 @@ define(
             for (var i = 0, l = fields.length; i < l; i++) {
                 var field = fields[i];
                 var colWidth = table.colsWidth[i];
-                var colClass = [];
-                var textClass = [];
-                var colAttr = [];
-                var textAttr = [];
+                var colClass = [];  // MARK td元素上的样式
+                var textClass = []; // MARK text div 上的样式
+                var colAttr = [];   // MARK td元素上的属性
+                var textAttr = [];  // MARK text div 上的属性
                 var textHtml = [];
                 var allHtml = [];
                 var textStartIndex = -1;
@@ -1487,7 +1497,7 @@ define(
                     }
 
                     if (hasValue(colHtml)) {
-                        if (colResult.notInText) {
+                        if (colResult.notInText) {  // MARK 指定content html 是不是 在 text div 元素里
                             colResult.index = s;
                             allHtml.push(colResult);
                         } else {
@@ -1508,6 +1518,8 @@ define(
                 allHtml.push({html: textHtml, index: textStartIndex});
                 allHtml.sort(sortByIndex);
 
+                // 比如有 tabsubrow 这种 extension 的时候，就会导致 allHtml 长度大于1
+                // tabsubrow 的 notInText 是配置为 true 的
                 if (allHtml.length > 1) {
                     var contentHtml = [
                         '<table width="100%" cellpadding="0" cellspacing="0">',
@@ -1567,6 +1579,7 @@ define(
 
             html.push('</tr></table></div>');
 
+            // 如果这一行就子行， 生成这一行的字行 容器 和 panel
             if (table.hasSubrow) {
                 for (var i = 0, l = builderList.length; i <l; i++) {
                     var subrowBuilder = builderList[i].getSubrowHtml;
@@ -1777,6 +1790,7 @@ define(
             }
 
             // 重新绘制每一列
+            // MARK 重新计算 和 设置列宽
             initColsWidth(table);               // 这一步也将重设bodyWidth
             resetColumns(table);
 
@@ -1821,6 +1835,7 @@ define(
          *
          * @private
          */
+        // MARK 这里的需求是什么
          function initTopResetHandler(table) {
             //避免重复绑定
             if (!table.followHead || table.topReseter) {
@@ -1972,6 +1987,7 @@ define(
             var j = 0;
             for (var i = 0; i < tdsLen; i++) {
                 var td = tds[i];
+                // MARK 这里会过滤掉 content 为 table中的td元素
                 if (getAttr(td, 'control-table') === id) {
                     var width = Math.max(
                         colsWidth[j % len] + rowWidthOffset,
@@ -2102,6 +2118,7 @@ define(
          * @private
          * @param {number} index 需要更新的body中checkbox行，不传则更新全部
          */
+        // MARK 更新 checkbox 的状态 和 那一行的样式信息
         function selectMulti(table, index, isSelected) {
             var selectedClass = 'row-selected';
             if (index >= 0) {
@@ -2137,6 +2154,7 @@ define(
          *
          * @private
          */
+        // MARK 更新选中列表 、 全选按钮状态 、触发table的select事件
         function resetMutilSelectedStatus(table) {
             var selectAll = getHeadCheckbox(table);
             var inputs = findSelectBox(table, 'checkbox');
@@ -2212,6 +2230,7 @@ define(
          * @private
          * @param {number} index 选取的序号
          */
+        // MARK 1. 更新radio状态; 2. 更新行样式; 3. 更新table的选中列表
         function selectSingle(table, index, isSelected) {
             var selectedIndex = table.selectedIndex;
             // index 为-1时表示全选，对于single类型不需要处理
@@ -2250,6 +2269,7 @@ define(
          *
          * @private
          */
+        // MARK 先禁用checkbox或者radio，然后禁用table下的子控件
         function setDisabledStyle(table) {
             var inputs = findSelectBox(
                 table, table.select === 'multi' ? 'checkbox' : 'radio');
@@ -2285,6 +2305,7 @@ define(
          *
          * @private
          */
+        // MARK 确定一个元素是否包含某些样式类
         var rclass = /[\t\r\n]/g;
         function getClassMatch(className){
             var cssClass= ' ' + className + ' ';
@@ -2318,6 +2339,12 @@ define(
          *
          * @private
          */
+        // MARK table下的元素的事件处理都存储在 table.handlers中
+        // table.handler = {
+        //      eleId: {
+        //          eventType: [handlers]
+        //      }
+        // }
         function getHandlers(table, el, eventType){
             var realId = el.id;
             var handlers = table.handlers[realId];
@@ -2372,6 +2399,7 @@ define(
             for (var i = 0, len = handlers.length; i < len ; i++) {
                 var handler = handlers[i];
 
+                // MARK 这里用倒序的方式来遍历，就不需要 j-- 运算了。
                 for (var j = 0, l = handlerQueue.length; j < l ; j++) {
                     if (handlerQueue[j] === handler) {
                         handlerQueue.splice(j, 1);
@@ -2392,6 +2420,8 @@ define(
         *
         * @private
         */
+       // MARK 从 e.target 到 element(即currentTarget) 只要满足样式条件handlerItem.matchFn
+       // 都会调用 handlerItem.handler
         function getDelegateHandler(element, handlerQueue, scrope) {
             return function(e) {
                 var e = e || window.event;
@@ -2446,6 +2476,7 @@ define(
             var multiSelectClass = getPartClasses(table, 'multi-select')[0];
             var singleSelectClass = getPartClasses(table, 'single-select')[0];
 
+            // MARK 表格 行 和 头 的处理函数
             addHandlers(
                 table,
                 table.main,
@@ -2478,6 +2509,7 @@ define(
                 ]
             );
 
+            // MARK 行、表头、全选按钮、行选按钮、行单选按钮 点击事件
             addHandlers(
                 table,
                 table.main,
@@ -2627,6 +2659,7 @@ define(
                     initFollowHead(table);
                     initTopResetHandler(table);
                 }
+                // MARK datasource 发生变化时，重新绘制 表体
                 if (fieldsChanged
                     || colsWidthChanged
                     || allProperities.encode
